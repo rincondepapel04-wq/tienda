@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tienda Profesional</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:url("fondo.jpg") center top / cover no-repeat fixed;
+}
+
+/* ESPACIO SUPERIOR PARA VER FONDO */
+
+.main{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
+margin-top:20vh;
+}
+
+/* PRODUCTOS */
+
+.container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:25px;
+}
+
+.card{
+width:280px;
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 6px 15px rgba(0,0,0,0.25);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-8px) scale(1.02);
+}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+cursor:pointer;
+}
+
+/* ANIMACION AGREGAR */
+
+.added{
+animation:pop .3s;
+}
+
+@keyframes pop{
+0%{transform:scale(1)}
+50%{transform:scale(1.1)}
+100%{transform:scale(1)}
+}
+
+/* TEXTO */
+
+.card h3{margin:10px;}
+.card p{margin:10px;font-weight:600;}
+
+/* CANTIDAD */
+
+.qty{
+display:flex;
+justify-content:center;
+gap:10px;
+}
+
+.qty button{
+background:black;
+color:white;
+border:none;
+padding:6px 12px;
+border-radius:5px;
+cursor:pointer;
+}
+
+.qty input{
+width:50px;
+text-align:center;
+}
+
+/* BOTON AGREGAR */
+
+.add{
+background:black;
+color:white;
+border:none;
+padding:10px;
+border-radius:20px;
+width:90%;
+margin:10px;
+cursor:pointer;
+}
+
+/* FORMULARIO */
+
+.formulario{
+margin-top:60px;
+max-width:420px;
+margin:auto;
+background:rgba(255,255,255,0.2);
+backdrop-filter:blur(12px);
+padding:25px;
+border-radius:14px;
+color:black;
+text-align:center;
+}
+
+/* BOTON CARRITO */
+
+.botonCarrito{
+position:fixed;
+right:20px;
+bottom:20px;
+background:black;
+color:white;
+border:none;
+padding:14px 20px;
+border-radius:30px;
+cursor:pointer;
+}
+
+/* PANEL */
+
+.carritoPanel{
+position:fixed;
+right:-400px;
+top:0;
+width:350px;
+height:100%;
+background:white;
+padding:20px;
+transition:.4s;
+overflow:auto;
+}
+
+.carritoPanel.activo{right:0;}
+
+.total{
+font-weight:bold;
+margin-top:15px;
+}
+
+/* BOTONES FLOTANTES */
+
+.floating{
+position:fixed;
+left:20px;
+bottom:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.floating a{
+width:50px;
+height:50px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+color:white;
+font-size:20px;
+text-decoration:none;
+}
+
+/* COLORES */
+
+.fb{background:#1877f2;}
+.ig{background:#E1306C;}
+.wa{background:#25D366;}
+.top{background:black;}
+
+/* ZOOM */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+justify-content:center;
+align-items:center;
+}
+
+.modal img{max-width:90%;}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<div class="container" id="productos"></div>
+
+<div class="formulario">
+
+<h3>Datos del cliente</h3>
+
+<input id="nombre" placeholder="Nombre">
+<input id="apellido" placeholder="Apellido">
+<input type="date" id="fecha de evento">
+
+<select id="entrega" onchange="cambiarEntrega()">
+<option value="">Entrega</option>
+<option value="Retiro">Retiro</option>
+<option value="Envio">Envío</option>
+</select>
+
+<input id="direccionEnvio" placeholder="Dirección">
+
+<div id="retiroLink" style="display:none">
+<a href="https://maps.app.goo.gl/hrkTuMXUugitd4rM6" target="_blank">
+Ver ubicación
+</a>
+</div>
+
+</div>
+
+</div>
+
+<button class="botonCarrito" onclick="abrirCarrito()">
+🛒 <span id="contador">0</span>
+</button>
+
+<div class="carritoPanel" id="carrito">
+
+<button onclick="cerrarCarrito()">Cerrar</button>
+
+<h2>Resumen</h2>
+
+<ul id="lista"></ul>
+
+<div class="total" id="total"></div>
+
+<button onclick="enviarWhats()">Enviar pedido</button>
+
+</div>
+
+<!-- BOTONES FLOTANTES -->
+
+<div class="floating">
+
+<a href="https://wa.me/5493815441312" target="_blank" class="wa">
+<i class="fab fa-whatsapp"></i>
+</a>
+
+<a href="https://www.facebook.com/people/Rinc%C3%B3n-De-Papel/pfbid0kmZgn3bUoNfYRjuHyStwSuS87XV2XXkY8GzQe1Cc1We6hBbYZtnB4ESqVs4nJELtl/?rdid=V92py2pdPxvPdup7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1AwXXoDEQQ%2F" target="_blank" class="fb">
+<i class="fab fa-facebook-f"></i>
+</a>
+
+<a href="https://www.instagram.com/rincondepapel_ok?igsh=MXF4cnU4OGQ0OGc5OA%3D%3D" target="_blank" class="ig">
+<i class="fab fa-instagram"></i>
+</a>
+
+<a href="#" onclick="scrollTopSmooth()" class="top">
+<i class="fas fa-arrow-up"></i>
+</a>
+
+</div>
+
+<div class="modal" id="modal" onclick="cerrarImagen()">
+<img id="imgGrande">
+</div>
+
+<script>
+
+let carrito={}
+
+/* PRODUCTOS EXCEL */
+
+fetch("productos.xlsx")
+.then(res=>res.arrayBuffer())
+.then(data=>{
+
+let wb=XLSX.read(data)
+let hoja=wb.Sheets[wb.SheetNames[0]]
+let productos=XLSX.utils.sheet_to_json(hoja)
+
+let cont=document.getElementById("productos")
+
+productos.forEach((p,i)=>{
+
+cont.innerHTML+=`
+
+<div class="card" id="card${i}">
+
+<img src="${p.imagen}" onclick="verImagen('${p.imagen}')">
+
+<h3>${p.nombre}</h3>
+<p>$${p.precio}</p>
+
+<div class="qty">
+<button onclick="menos(${i})">-</button>
+<input id="q${i}" value="1">
+<button onclick="mas(${i})">+</button>
+</div>
+
+<button class="add" onclick="agregar('${p.nombre}',${p.precio},${i})">
+Agregar
+</button>
+
+</div>
+
+`
+
+})
+
+})
+
+function mas(i){
+let q=document.getElementById("q"+i)
+q.value=parseInt(q.value)+1
+}
+
+function menos(i){
+let q=document.getElementById("q"+i)
+if(q.value>1) q.value=parseInt(q.value)-1
+}
+
+function agregar(nombre,precio,i){
+
+let cantidad=parseInt(document.getElementById("q"+i).value)
+
+if(carrito[nombre]){
+carrito[nombre].cantidad+=cantidad
+}else{
+carrito[nombre]={precio:precio,cantidad:cantidad}
+}
+
+document.getElementById("card"+i).classList.add("added")
+
+setTimeout(()=>{
+document.getElementById("card"+i).classList.remove("added")
+},300)
+
+actualizar()
+}
+
+function actualizar(){
+
+let lista=document.getElementById("lista")
+lista.innerHTML=""
+
+let total=0
+let dinero=0
+
+for(let p in carrito){
+
+let item=carrito[p]
+
+lista.innerHTML+=`<li>${p} x${item.cantidad}</li>`
+
+total+=item.cantidad
+dinero+=item.cantidad*item.precio
+
+}
+
+document.getElementById("contador").innerText=total
+document.getElementById("total").innerText="Total: $"+dinero
+
+}
+
+function abrirCarrito(){
+document.getElementById("carrito").classList.add("activo")
+}
+
+function cerrarCarrito(){
+document.getElementById("carrito").classList.remove("activo")
+}
+
+function cambiarEntrega(){
+
+let tipo=document.getElementById("entrega").value
+
+if(tipo=="Retiro"){
+document.getElementById("direccionEnvio").style.display="none"
+document.getElementById("retiroLink").style.display="block"
+}else{
+document.getElementById("direccionEnvio").style.display="block"
+document.getElementById("retiroLink").style.display="none"
+}
+}
+
+function enviarWhats(){
+
+let texto="Pedido:\n"
+
+for(let p in carrito){
+texto+=p+" x"+carrito[p].cantidad+"\n"
+}
+
+window.open("https://wa.me/5493815441312?text="+encodeURIComponent(texto))
+}
+
+function scrollTopSmooth(){
+window.scrollTo({top:0,behavior:'smooth'})
+}
+
+/* ZOOM */
+
+function verImagen(src){
+document.getElementById("modal").style.display="flex"
+document.getElementById("imgGrande").src=src
+}
+
+function cerrarImagen(){
+document.getElementById("modal").style.display="none"
+}
+
+</script>
+
+</body>
+</html>
