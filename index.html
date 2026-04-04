@@ -66,9 +66,10 @@ cursor:pointer;
 
 .indicadores{
 position:absolute;
-bottom:8px;
+bottom:2px; /* 👈 ahora sí queda en la base de la imagen */
 width:100%;
 text-align:center;
+pointer-events:none;
 }
 
 .indicadores span{
@@ -335,6 +336,8 @@ cont.innerHTML+=`
 
 <div class="card">
 
+<div class="galeriaWrap">
+
 <div class="galeria" onscroll="actualizarDots(this, ${i})">
 ${galeria}
 </div>
@@ -343,6 +346,7 @@ ${galeria}
 ${dots}
 </div>
 
+</div>
 <div class="swipeIcon">↔</div>
 
 <h3>${p.nombre}</h3>
@@ -399,12 +403,18 @@ if(q.value>1) q.value=parseInt(q.value)-1
 
 function agregar(nombre,precio,i){
 
-let cantidad=parseInt(document.getElementById("q"+i).value)
+let valor = document.getElementById("q"+i).value
+
+let cantidad = parseInt(valor)
+
+if(isNaN(cantidad) || cantidad <= 0){
+cantidad = 1
+}
 
 if(carrito[nombre]){
-carrito[nombre].cantidad+=cantidad
+carrito[nombre].cantidad += cantidad
 }else{
-carrito[nombre]={precio:precio,cantidad:cantidad}
+carrito[nombre] = {precio:precio, cantidad:cantidad}
 }
 
 actualizar()
