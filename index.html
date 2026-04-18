@@ -501,26 +501,52 @@ let tematica=document.getElementById("tematica").value
 
 let totalTexto=document.getElementById("total").innerText
 
-let texto="✨ *NUEVO PEDIDO* ✨\n"
-texto+="━━━━━━━━━━━━━━━\n\n"
+let texto="🎉✨ *NUEVO PEDIDO* ✨🎉\n"
+texto+="════════════════════\n\n"
 
 /* CLIENTE */
 
 texto+="👤 *DATOS DEL CLIENTE*\n"
-texto+="• Nombre: "+nombre+" "+apellido+"\n"
-texto+="• Fecha del evento: "+fecha+"\n"
-texto+="• Temática: "+tematica+"\n\n"
+texto+="📝 Nombre: "+nombre+" "+apellido+"\n"
+texto+="📅 Fecha del evento: "+fecha+"\n"
+texto+="🎨 Temática: "+tematica+"\n\n"
 
 /* ENTREGA */
 
-texto+="📦 *ENTREGA*\n"
+texto+="📦🚚 *ENTREGA*\n"
 
 if(entrega=="Retiro"){
-texto+="• Tipo: Retiro en domicilio\n"
-texto+="• Ubicación: https://maps.app.goo.gl/wgjL3WFK9cv3dm3N9?g_st=ac\n\n"
+texto+="📍 Tipo: Retiro en domicilio\n"
+texto+="🗺️ Ubicación: https://maps.app.goo.gl/wgjL3WFK9cv3dm3N9?g_st=ac\n\n"
 }else{
-texto+="• Tipo: Envío\n"
-texto+="• Dirección: "+direccion+"\n\n"
+texto+="🚚 Tipo: Envío\n"
+texto+="🏠 Dirección: "+direccion+"\n\n"
+}
+
+/* PRODUCTOS */
+
+texto+="🛒🎁 *DETALLE DEL PEDIDO*\n"
+
+for(let p in carrito){
+let item=carrito[p]
+texto+="🔹 "+p+"\n"
+texto+="   ➤ Cantidad: "+item.cantidad+"\n"
+}
+
+/* TOTAL */
+
+texto+="\n════════════════════\n"
+texto+="💰💵 *"+totalTexto+"*\n"
+texto+="════════════════════\n\n"
+
+/* FINAL */
+
+texto+="🙏✨ ¡Gracias por tu pedido!\n"
+texto+="📲 Te contactaremos a la brevedad\n"
+texto+="💖 ¡Que tengas un hermoso evento!"
+
+window.open("https://wa.me/5493815441312?text="+encodeURIComponent(texto))
+
 }
 
 /* PRODUCTOS */
